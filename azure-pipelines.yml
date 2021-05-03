@@ -91,6 +91,7 @@ stages:
 
           - script: |
               echo "Swap with production slot"
+              echo $(DEPLOY_TYPE)
             displayName: 'Swap with production slot'
 
   # Deploy on production slot
