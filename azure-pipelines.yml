@@ -70,7 +70,7 @@ stages:
           # Build application
           - script: |
               echo "build app"
-              echo $(DEPLOY_TYPE)
+              echo $DEPLOY_TYPE
             displayName: 'Build'
 
   # Deploy on staging slot and swap
