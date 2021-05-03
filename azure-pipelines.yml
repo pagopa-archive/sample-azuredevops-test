@@ -1,19 +1,112 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Azure DevOps pipeline to release a new version and deploy to production.
 
-trigger:
-- main
+# Only manual activations are intended
+trigger: none
+pr: none
+
+parameters:
+  - name: 'RELEASE_SEMVER'
+    displayName: 'When packing a release, define the version bump to apply'
+    type: string
+    values:
+      - major
+      - minor
+      - patch
+    default: minor
+  - name: environment
+    displayName: Target Environment
+    type: string
+    default: uat
+    values:
+      - uat
+      - prod
+
+variables:
+  DEFAULT_BRANCH: $(DEFAULT_BRANCH)
+  HEALTHCHECK_CONTAINER_SUBNET: $(HEALTHCHECK_CONTAINER_SUBNET)
+  ${{ if eq(parameters['environment'], 'uat') }}:
+    DEPLOY_TYPE: $(UAT_DEPLOY_TYPE)
+  ${{ if eq(parameters['environment'], 'prod') }}:
+    DEPLOY_TYPE: $(PROD_DEPLOY_TYPE)
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  # Create a relase
+  # Activated when ONE OF these are met:
+  # - is on branch $(DEFAULT_BRANCH) 
+  # - is a tag in the form v{version}-RELEASE
+  - stage: Release
+    condition:
+      and(
+        succeeded(),
+        or(
+          eq(variables['Build.SourceBranch'], join('refs/heads/', '${{ variables.DEFAULT_BRANCH }}')),
+          and(
+            startsWith(variables['Build.SourceBranch'], 'refs/tags'),
+            endsWith(variables['Build.SourceBranch'], '-RELEASE')
+          )
+        )
+      )
+    pool:
+      vmImage: 'ubuntu-latest'
+    jobs:
+      - job: make_release
+        steps:
+        - ${{ if eq(variables['Build.SourceBranch'], join('refs/heads/', '${{ variables.DEFAULT_BRANCH }}')) }}:
+          - script: |
+              echo "master branch"
+            displayName: 'Skip release bundle'
+
+        - ${{ if ne(variables['Build.SourceBranch'], join('refs/heads/', '${{ variables.DEFAULT_BRANCH }}')) }}:
+          - script: |
+              echo "not master branch"
+            displayName: 'Skip release bundle'
+
+  # Prepare_artifact
+  - stage: Prepare_artifact
+    dependsOn:
+      - Release
+    jobs:
+      - job: 'prepare_artifact'
+        steps:
+          # Build application
+          - script: |
+              echo "build app"
+            displayName: 'Build'
+
+  # Deploy on staging slot and swap
+  - stage: 'Deploy_staging_slot'
+    condition:
+      eq('${{ variables.DEPLOY_TYPE }}', 'staging_slot_and_swap')
+    dependsOn:
+      - Prepare_artifact
+    jobs:
+      - job: 'do_deploy'
+        steps:
+          - script: |
+              echo "Deploy to staging slot"
+            displayName: 'Deploy to staging slot'
+
+          - script: |
+              echo "Healthcheck"
+            displayName: 'Healthcheck'
+
+          - script: |
+              echo "Swap with production slot"
+            displayName: 'Swap with production slot'
+
+  # Deploy on production
+  - stage: 'Deploy_production_slot'
+    condition:
+      eq('${{ variables.DEPLOY_TYPE }}', 'production_slot')
+    dependsOn:
+      - Prepare_artifact
+    jobs:
+      - job: 'do_deploy'
+        steps:
+          - script: |
+              echo "Deploy to production slot"
+            displayName: 'Deploy to production slot'
