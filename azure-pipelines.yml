@@ -43,7 +43,7 @@ stages:
       and(
         succeeded(),
         or(
-          eq(variables['Build.SourceBranch'], join('refs/heads/', '${{ variables.DEFAULT_BRANCH }}')),
+          eq(variables['Build.SourceBranch'], 'refs/heads/main')),
           and(
             startsWith(variables['Build.SourceBranch'], 'refs/tags'),
             endsWith(variables['Build.SourceBranch'], '-RELEASE')
@@ -55,12 +55,12 @@ stages:
     jobs:
       - job: make_release
         steps:
-        - ${{ if eq(variables['Build.SourceBranch'], join('refs/heads/', '${{ variables.DEFAULT_BRANCH }}')) }}:
+        - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
           - script: |
               echo "master branch"
             displayName: 'Skip release bundle'
 
-        - ${{ if ne(variables['Build.SourceBranch'], join('refs/heads/', '${{ variables.DEFAULT_BRANCH }}')) }}:
+        - ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/main') }}:
           - script: |
               echo "not master branch"
             displayName: 'Skip release bundle'
@@ -80,7 +80,7 @@ stages:
   # Deploy on staging slot and swap
   - stage: 'Deploy_staging_slot'
     condition:
-      eq('${{ variables.DEPLOY_TYPE }}', 'staging_slot_and_swap')
+      and(succeeded(),eq('${{ variables.DEPLOY_TYPE }}', 'staging_slot_and_swap'))
     dependsOn:
       - Prepare_artifact
     jobs:
@@ -101,7 +101,7 @@ stages:
   # Deploy on production
   - stage: 'Deploy_production_slot'
     condition:
-      eq('${{ variables.DEPLOY_TYPE }}', 'production_slot')
+      and(succeeded(),eq('${{ variables.DEPLOY_TYPE }}', 'staging_slot_and_swap'))
     dependsOn:
       - Prepare_artifact
     jobs:
