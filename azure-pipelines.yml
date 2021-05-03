@@ -75,7 +75,7 @@ stages:
 
   # Deploy on staging slot and swap
   - ${{ if eq(variables.DEPLOY_TYPE, 'staging_slot_and_swap') }}:
-    - stage: 'Deploy_to_${{ parameters.environment }}_staging_slot_and_swap'
+    - stage: 'Deploy_to_${{ parameters.environment }}_${{ variables.DEPLOY_TYPE }}'
       dependsOn:
         - Prepare_artifact
       jobs:
@@ -94,8 +94,8 @@ stages:
               displayName: 'Swap with production slot'
 
   # Deploy on production slot
-  - ${{ if eq(variables.DEPLOY_TYPE, 'production_slot') }}:
-    - stage: 'Deploy_to_${{ parameters.environment }}_production_slot'
+  - ${{ if eq('production_slot', 'production_slot') }}:
+    - stage: 'Deploy_to_${{ parameters.environment }}_${{ variables.DEPLOY_TYPE }}'
       dependsOn:
         - Prepare_artifact
       jobs:
