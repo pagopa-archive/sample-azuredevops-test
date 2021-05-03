@@ -76,33 +76,33 @@ stages:
             displayName: 'Build'
 
   # Deploy on staging slot and swap
-  - ${{ if eq(parameters.DEPLOY_TYPE, 'staging_slot_and_swap') }}:
-    - stage: 'Deploy_to_${{ parameters.environment }}_staging_slot_and_swap'
-      dependsOn:
-        - Prepare_artifact
-      jobs:
-        - job: 'do_deploy_to_${{ parameters.environment }}'
-          steps:
-            - script: |
-                echo "Deploy to staging slot"
+  - stage: 'Deploy_to_${{ parameters.environment }}_staging_slot_and_swap'
+    condition: eq(parameters.DEPLOY_TYPE, 'staging_slot_and_swap')
+    dependsOn:
+      - Prepare_artifact
+    jobs:
+      - job: 'do_deploy_to_${{ parameters.environment }}'
+        steps:
+          - script: |
+              echo "Deploy to staging slot"
               displayName: 'Deploy to staging slot'
   
-            - script: |
-                echo "Healthcheck"
-              displayName: 'Healthcheck'
+          - script: |
+              echo "Healthcheck"
+            displayName: 'Healthcheck'
   
-            - script: |
-                echo "Swap with production slot"
-              displayName: 'Swap with production slot'
+          - script: |
+              echo "Swap with production slot"
+            displayName: 'Swap with production slot'
 
   # Deploy on production slot
-  - ${{ if eq(parameters.DEPLOY_TYPE, 'production_slot') }}:
-    - stage: 'Deploy_to_${{ parameters.environment }}_production_slot'
-      dependsOn:
-        - Prepare_artifact
-      jobs:
-        - job: 'do_deploy_to_${{ parameters.environment }}'
-          steps:
-            - script: |
-                echo "Deploy to production slot"
-              displayName: 'Deploy to production slot'
+  - stage: 'Deploy_to_${{ parameters.environment }}_production_slot'
+    condition: eq(parameters.DEPLOY_TYPE, 'production_slot')
+    dependsOn:
+      - Prepare_artifact
+    jobs:
+      - job: 'do_deploy_to_${{ parameters.environment }}'
+        steps:
+          - script: |
+              echo "Deploy to production slot"
+            displayName: 'Deploy to production slot'
