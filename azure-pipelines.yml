@@ -73,11 +73,9 @@ stages:
               echo $DEPLOY_TYPE
             displayName: 'Build'
 
-  - ${{ if eq(variables.DEPLOY_TYPE, staging_slot_and_swap) }}:
-  # Deploy on staging slot and swap
+  - ${{ if eq(variables.DEPLOY_TYPE, 'staging_slot_and_swap') }}:
+    # Deploy on staging slot and swap
     - stage: 'Deploy_staging_slot_and_swap'
-      condition:
-        eq(variables.DEPLOY_TYPE, 'staging_slot_and_swap')
       dependsOn:
         - Prepare_artifact
       jobs:
@@ -95,8 +93,8 @@ stages:
                 echo "Swap with production slot"
               displayName: 'Swap with production slot'
 
-  - ${{ if eq(variables.DEPLOY_TYPE, production_slot) }}:
-  # Deploy on production slot
+  - ${{ if eq(variables.DEPLOY_TYPE, 'production_slot') }}:
+    # Deploy on production slot
     - stage: 'Deploy_production_slot'
       dependsOn:
         - Prepare_artifact
