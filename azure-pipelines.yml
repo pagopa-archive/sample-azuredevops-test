@@ -78,7 +78,7 @@ stages:
   # Deploy on staging slot and swap
   - stage: 'Deploy_staging_slot_and_swap'
     condition:
-      and(succeeded(), eq('${{ variables.DEPLOY_TYPE }}', staging_slot_and_swap))
+      and(succeeded(), eq('${{ variables.DEPLOY_TYPE }}', 'staging_slot_and_swap'))
     dependsOn:
       - Prepare_artifact
     jobs:
@@ -99,7 +99,7 @@ stages:
   # Deploy on production
   - stage: 'Deploy_production_slot'
     condition:
-      and(succeeded(), eq('${{ variables.DEPLOY_TYPE }}', production_slot))
+      and(succeeded(), eq('${{ variables.DEPLOY_TYPE }}', 'production_slot'))
     dependsOn:
       - Prepare_artifact
     jobs:
