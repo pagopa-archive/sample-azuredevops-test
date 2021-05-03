@@ -99,7 +99,7 @@ stages:
   # Deploy on production slot
   - stage: 'Deploy_production_slot'
     condition:
-      eq(variables.DEPLOY_TYPE, 'production_slot')
+      $[eq(variables['DEPLOY_TYPE'], 'production_slot')]
     dependsOn:
       - Prepare_artifact
     jobs:
