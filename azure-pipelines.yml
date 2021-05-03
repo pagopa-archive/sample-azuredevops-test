@@ -96,10 +96,10 @@ stages:
               echo "Swap with production slot"
             displayName: 'Swap with production slot'
 
-  # Deploy on production
+  # Deploy on production slot
   - stage: 'Deploy_production_slot'
     condition:
-      and(succeeded(), eq(variables.DEPLOY_TYPE, 'production_slot'))
+      eq(variables.DEPLOY_TYPE, 'production_slot')
     dependsOn:
       - Prepare_artifact
     jobs:
