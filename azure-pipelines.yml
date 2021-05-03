@@ -24,10 +24,10 @@ parameters:
 variables:
   ${{ if eq(parameters['environment'], 'uat') }}:
     # DEPLOY_TYPE: $(UAT_DEPLOY_TYPE)
-    DEPLOY_TYPE: $[variables['UAT_DEPLOY_TYPE']]
+    DEPLOY_TYPE: $[ variables['UAT_DEPLOY_TYPE'] ]
   ${{ if eq(parameters['environment'], 'prod') }}:
     # DEPLOY_TYPE: $(PROD_DEPLOY_TYPE)
-    DEPLOY_TYPE: $[variables['PROD_DEPLOY_TYPE']]
+    DEPLOY_TYPE: $[ variables['PROD_DEPLOY_TYPE'] ]
 
 pool:
   vmImage: 'ubuntu-latest'
