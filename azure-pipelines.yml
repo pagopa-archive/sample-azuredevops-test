@@ -23,9 +23,11 @@ parameters:
 
 variables:
   ${{ if eq(parameters['environment'], 'uat') }}:
-    DEPLOY_TYPE: $(UAT_DEPLOY_TYPE)
+    # DEPLOY_TYPE: $(UAT_DEPLOY_TYPE)
+    DEPLOY_TYPE: $[variables['UAT_DEPLOY_TYPE']]
   ${{ if eq(parameters['environment'], 'prod') }}:
-    DEPLOY_TYPE: $(PROD_DEPLOY_TYPE)
+    # DEPLOY_TYPE: $(PROD_DEPLOY_TYPE)
+    DEPLOY_TYPE: $[variables['PROD_DEPLOY_TYPE']]
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -75,7 +77,7 @@ stages:
 
   # Deploy on staging slot and swap
   - ${{ if eq(variables.DEPLOY_TYPE, 'staging_slot_and_swap') }}:
-    - stage: 'Deploy_to_${{ parameters.environment }}_$[ variables.DEPLOY_TYPE ]'
+    - stage: 'Deploy_to_${{ parameters.environment }}_${{ variables.DEPLOY_TYPE }}'
       dependsOn:
         - Prepare_artifact
       jobs:
@@ -95,7 +97,7 @@ stages:
 
   # Deploy on production slot
   - ${{ if eq('production_slot', 'production_slot') }}:
-    - stage: 'Deploy_to_${{ parameters.environment }}_$[ variables.DEPLOY_TYPE ]'
+    - stage: 'Deploy_to_${{ parameters.environment }}_${{ variables.DEPLOY_TYPE }}'
       dependsOn:
         - Prepare_artifact
       jobs:
