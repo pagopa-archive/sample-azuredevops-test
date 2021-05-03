@@ -23,7 +23,6 @@ parameters:
 
 variables:
   DEFAULT_BRANCH: $(DEFAULT_BRANCH)
-  HEALTHCHECK_CONTAINER_SUBNET: $(HEALTHCHECK_CONTAINER_SUBNET)
   ${{ if eq(parameters['environment'], 'uat') }}:
     DEPLOY_TYPE: $(UAT_DEPLOY_TYPE)
   ${{ if eq(parameters['environment'], 'prod') }}:
@@ -58,7 +57,7 @@ stages:
         - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
           - script: |
               echo "master branch"
-            displayName: 'Skip release bundle'
+            displayName: 'Release bundle'
 
         - ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/main') }}:
           - script: |
