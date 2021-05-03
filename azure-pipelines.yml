@@ -22,7 +22,6 @@ parameters:
       - prod
 
 variables:
-  DEFAULT_BRANCH: $(DEFAULT_BRANCH)
   ${{ if eq(parameters['environment'], 'uat') }}:
     DEPLOY_TYPE: $(UAT_DEPLOY_TYPE)
   ${{ if eq(parameters['environment'], 'prod') }}:
