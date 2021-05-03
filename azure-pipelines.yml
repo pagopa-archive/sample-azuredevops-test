@@ -76,28 +76,30 @@ stages:
             displayName: 'Build'
 
   # Deploy 
-  - stage: 'Deploy_to_${{ parameters.environment }}_production_slot'
+  - stage: 'Deploy_to_${{ parameters.environment }}'
     dependsOn:
       - Prepare_artifact
     jobs:
-      - job: 'do_deploy_production_slot'
-        condition: and(succeeded(),eq(variables.DEPLOY_TYPE, 'production_slot'))
-        steps:
-          - script: |
-              echo "Deploy to production slot"
-            displayName: 'Deploy to production slot'
+      - ${{ if eq(variables.DEPLOY_TYPE, 'production_slot')) }}:
+        - job: 'do_deploy_production_slot'
+          # condition: and(succeeded(),eq(variables.DEPLOY_TYPE, 'production_slot'))
+          steps:
+            - script: |
+                echo "Deploy to production slot"
+              displayName: 'Deploy to production slot'
 
-      - job: 'do_deploy_staging_slot_and_swap'
-        condition: and(succeeded(),eq(variables.DEPLOY_TYPE, 'staging_slot_and_swap'))
-        steps:
-          - script: |
-              echo "Deploy to staging slot"
-              displayName: 'Deploy to staging slot'
-  
-          - script: |
-              echo "Healthcheck"
-            displayName: 'Healthcheck'
-  
-          - script: |
-              echo "Swap with production slot"
-            displayName: 'Swap with production slot'
+      - ${{ if eq(variables.DEPLOY_TYPE, 'staging_slot_and_swap')) }}:
+        - job: 'do_deploy_staging_slot_and_swap'
+          # condition: and(succeeded(),eq(variables.DEPLOY_TYPE, 'staging_slot_and_swap'))
+          steps:
+            - script: |
+                echo "Deploy to staging slot"
+                displayName: 'Deploy to staging slot'
+
+            - script: |
+                echo "Healthcheck"
+              displayName: 'Healthcheck'
+
+            - script: |
+                echo "Swap with production slot"
+              displayName: 'Swap with production slot'
