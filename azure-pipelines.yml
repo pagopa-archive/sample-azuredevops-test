@@ -92,7 +92,7 @@ stages:
         steps:
           - script: |
               echo "Deploy to staging slot"
-              displayName: 'Deploy to staging slot'
+            displayName: 'Deploy to staging slot'
 
           - script: |
               echo "Healthcheck"
