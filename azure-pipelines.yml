@@ -23,10 +23,8 @@ parameters:
 
 variables:
   ${{ if eq(parameters['environment'], 'uat') }}:
-    # DEPLOY_TYPE: $(UAT_DEPLOY_TYPE)
     DEPLOY_TYPE: $[variables['UAT_DEPLOY_TYPE']]
   ${{ if eq(parameters['environment'], 'prod') }}:
-    # DEPLOY_TYPE: $(PROD_DEPLOY_TYPE)
     DEPLOY_TYPE: $[variables['PROD_DEPLOY_TYPE']]
 
 pool:
@@ -51,15 +49,17 @@ stages:
       vmImage: 'ubuntu-latest'
     jobs:
       - job: make_release
+        condition: eq(variables['Build.SourceBranch'], format('refs/heads/{0}', variables.DEFAULT_BRANCH))
         steps:
           - script: |
               echo "DEFAULT_BRANCH branch"
-            condition: eq(variables['Build.SourceBranch'], format('refs/heads/{0}', variables.DEFAULT_BRANCH))
             displayName: 'Release bundle'
 
+      - job: skip_release
+        condition: ne(variables['Build.SourceBranch'], format('refs/heads/{0}', variables.DEFAULT_BRANCH))
+        steps:
           - script: |
               echo "not DEFAULT_BRANCH branch"
-            condition: ne(variables['Build.SourceBranch'], format('refs/heads/{0}', variables.DEFAULT_BRANCH))
             displayName: 'Skip release bundle'
 
   # Prepare_artifact
