@@ -50,7 +50,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     jobs:
-      - job: make_release_format('refs/heads/{0}', variables.DEFAULT_BRANCH)
+      - job: make_release_${{ format('refs/heads/{0}', variables.DEFAULT_BRANCH) }}
         steps:
         - ${{ if eq(variables['Build.SourceBranch'], format('refs/heads/{0}', variables.DEFAULT_BRANCH)) }}:
           - script: |
